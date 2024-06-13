@@ -12,6 +12,15 @@ client = openai.OpenAI(base_url=os.getenv('BASE_URL'), api_key=os.getenv('API_KE
 # Replace 'YOUR_TOKEN' with the token you got from BotFather
 TOKEN = os.getenv('TOKEN')
 
+#Enable Groupchat Mode with @bot set to true to enable
+GROUP_CHAT_MODE = os.getenv('GROUP_CHAT_MODE')
+print('group chat mode:', GROUP_CHAT_MODE)
+if GROUP_CHAT_MODE is None:
+    GROUP_CHAT_MODE = False  # Set a default value
+else:
+    GROUP_CHAT_MODE = GROUP_CHAT_MODE.lower() == 'true'
+
+
 # A dictionary to keep track of chat histories for different users
 chat_histories = {}
 
@@ -50,13 +59,20 @@ async def handle_message(update, context):
     user_id = update.effective_chat.id
     message_text = update.message.text
 
-    # Check if the message contains "@bot"
-    if "@bot" in message_text:
-        # Remove "@bot" from the message text
-        processed_text = message_text.replace("@bot", "").strip()
+    if GROUP_CHAT_MODE:
+        # Check if the message contains "@bot"
+        if "@bot" in message_text:
+            # Remove "@bot" from the message text
+            processed_text = message_text.replace("@bot", "").strip()
 
+            # Get response from OpenAI
+            openai_response = get_openai_response(user_id, processed_text)
+
+            # Send the response back to the user
+            await context.bot.send_message(chat_id=user_id, text=openai_response)
+    else:
         # Get response from OpenAI
-        openai_response = get_openai_response(user_id, processed_text)
+        openai_response = get_openai_response(user_id, message_text)
 
         # Send the response back to the user
         await context.bot.send_message(chat_id=user_id, text=openai_response)

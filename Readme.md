@@ -42,6 +42,8 @@ set BASE_URL=model-source
 
 set MODEL=your-openai-model
 
+set GROUP_CHAT_MODE=true or false, if true then it can only be addressed with @bot, message xyz...
+
 ### 6. Run the Bot
 
 Run the bot using Python:
